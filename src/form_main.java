@@ -136,6 +136,11 @@ public class form_main extends javax.swing.JFrame {
         });
 
         refresh.setText("REFRESH");
+        refresh.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                refreshActionPerformed(evt);
+            }
+        });
 
         delete.setText("DELETE");
 
@@ -389,6 +394,11 @@ public class form_main extends javax.swing.JFrame {
         lama.setText("");
         total.setText("");
     }//GEN-LAST:event_clearActionPerformed
+
+    private void refreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshActionPerformed
+        // TODO add your handling code here:
+        selectData();
+    }//GEN-LAST:event_refreshActionPerformed
 
     /**
      * @param args the command line arguments
