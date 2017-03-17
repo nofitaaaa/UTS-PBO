@@ -1,8 +1,15 @@
 
+import static java.lang.Math.toIntExact;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import javax.swing.JOptionPane;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.table.DefaultTableModel;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -115,6 +122,11 @@ public class form_main extends javax.swing.JFrame {
         jPanel2.setBackground(new java.awt.Color(0, 0, 0));
 
         clear.setText("CLEAR");
+        clear.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                clearActionPerformed(evt);
+            }
+        });
 
         save.setText("SAVE");
         save.addActionListener(new java.awt.event.ActionListener() {
@@ -137,7 +149,7 @@ public class form_main extends javax.swing.JFrame {
                 {null, null, null, null, null, null, null}
             },
             new String [] {
-                "Nama Peminjam", "Alamat", "No Struck", "No. Polisi", "Tanggal Pinjam", "Tanggal Kembali", "Total harga"
+                "NamaPeminjam", "Alamat", "NoStruck", "NoPolisi", "TanggalPinjam", "TanggalKembali", "Totalharga"
             }
         ));
         jScrollPane1.setViewportView(tabel);
@@ -314,15 +326,21 @@ public class form_main extends javax.swing.JFrame {
         
       
         
-        if(nama.getText().equals("") || alamat.getText().equals("") || no_struck.getText().equals("") || nopol.getText().equals("") || pinjam.equals("") || kembali.equals(""))
+        if(nama.getText().equals("") || alamat.getText().equals("") || no_struck.getText().equals("") || nopol.getText().equals("") || pinjam.equals("") || kembali.equals("") || total.equals(""))
         {
             JOptionPane.showMessageDialog(this, "Harap lengkapi Data", "Error", JOptionPane.WARNING_MESSAGE);
         }
         
         else
         {
-            String SQL = "INSERT INTO tb_rental VALUES ('" + nama.getText() + "', " + alamat.getText() + ", " + no_struck.getText() + ", " + nopol.getText() + ", " + pinjam + ", " + kembali + "')";
-            
+            String SQL = "INSERT INTO tb_rental VALUES ('" + nama.getText() + "','" + 
+                                                            alamat.getText() + "','" + 
+                                                            no_struck.getText() + "','" + 
+                                                            nopol.getText() + "','" + 
+                                                            pinjam + "','" + 
+                                                            kembali + "','" +
+                                                            total.getText() + "')";
+            System.out.println(SQL);
             int status = koneksi_db.execute(SQL);
             
             if(status == 1)
@@ -343,21 +361,34 @@ public class form_main extends javax.swing.JFrame {
     private void hitungActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hitungActionPerformed
         // TODO add your handling code here:
         
-        try
-        {
-            Date TanggalPinjam = tgl_pinjam.getDate();
-            SimpleDateFormat date = new SimpleDateFormat("dd-MM-yyyy");            
-            Date TanggalKembali = tgl_kembali.getDate();
-            
-            long Telat = Math.abs(TanggalKembali.getTime()–TanggalPinjam.getTime());
-            lama.setText(“” + TimeUnit.MILLISECONDS.toDays(Telat));
-        }
-        
-        catch(Exception e)
-        {
-            System.out.println(e);
-        }
+        Date pinjam = tgl_pinjam.getDate();
+        Date kembali = tgl_kembali.getDate();
+        long startTime = pinjam.getTime();
+        long endTime = kembali.getTime();
+        long bedaTime = endTime - startTime;
+        long bedaHari = bedaTime / (1000 * 60 * 60 * 24);
+        DateFormat dateFormat = DateFormat.getDateInstance();
+
+        lama.setText(" "+bedaHari+" hari");
+
+        int lama1 = toIntExact(bedaHari);
+        int total1 = lama1 * 20000;
+        String harga = Integer.toString(total1);
+
+        total.setText(harga);
     }//GEN-LAST:event_hitungActionPerformed
+
+    private void clearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearActionPerformed
+        // TODO add your handling code here:
+        nama.setText("");
+        alamat.setText("");
+        no_struck.setText("");
+        nopol.setText("");
+        tgl_pinjam.setDate(null);
+        tgl_kembali.setDate(null);
+        lama.setText("");
+        total.setText("");
+    }//GEN-LAST:event_clearActionPerformed
 
     /**
      * @param args the command line arguments
@@ -427,7 +458,36 @@ public class form_main extends javax.swing.JFrame {
     private javax.swing.JTextField total;
     // End of variables declaration//GEN-END:variables
 
-    private void selectData() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private void selectData() 
+    {
+        String kolom[] = {"nama_peminjam","alamat","no_struck","no_polisi","tgl_pinjam","tgl_kembali", "harga"};
+        DefaultTableModel dtm = new DefaultTableModel(null, kolom);
+        
+        String SQL = "SELECT * FROM tb_rental";
+        ResultSet rs = koneksi_db.executeQuery(SQL);
+        
+        try
+        {
+            while(rs.next())
+            {
+                String nama_peminjam = rs.getString(1);
+                String alamat = rs.getString(2);
+                String no_struck = rs.getString(3);
+                String no_polisi = rs.getString(4);
+                String tgl_pinjam = rs.getString(5);
+                String tgl_kembali = rs.getString(6);
+                String harga = rs.getString(7);
+                                
+                String data[] = {nama_peminjam, alamat, no_struck, no_polisi, tgl_pinjam, tgl_kembali, harga};
+                dtm.addRow(data);
+            }             
+        }
+        
+        catch(SQLException ex)
+        {
+            Logger.getLogger(form_main.class.getName()).log(Level.SEVERE,null, ex);
+        }
+            
+            tabel.setModel(dtm);
     }
 }
