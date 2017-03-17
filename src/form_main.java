@@ -3,12 +3,14 @@ import static java.lang.Math.toIntExact;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import javax.swing.JOptionPane;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 /*
@@ -150,6 +152,11 @@ public class form_main extends javax.swing.JFrame {
         });
 
         print.setText("PRINT");
+        print.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                printActionPerformed(evt);
+            }
+        });
 
         tabel.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -432,6 +439,24 @@ public class form_main extends javax.swing.JFrame {
         }
         
     }//GEN-LAST:event_deleteActionPerformed
+
+    private void printActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printActionPerformed
+        // TODO add your handling code here:
+        
+        MessageFormat header = new MessageFormat("SPIDERMOTOR");
+        MessageFormat footer = new MessageFormat("Page (0,number,integer)   ");
+        
+        try
+        {
+            tabel.print(JTable.PrintMode.FIT_WIDTH, header, footer, true, null, true, null);
+        }
+        
+        catch(java.awt.print.PrinterException e)
+                {
+                    System.err.format("Cannot Print %s%n", e.getMessage());
+                }
+        
+    }//GEN-LAST:event_printActionPerformed
 
     /**
      * @param args the command line arguments
