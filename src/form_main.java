@@ -143,6 +143,11 @@ public class form_main extends javax.swing.JFrame {
         });
 
         delete.setText("DELETE");
+        delete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deleteActionPerformed(evt);
+            }
+        });
 
         print.setText("PRINT");
 
@@ -399,6 +404,34 @@ public class form_main extends javax.swing.JFrame {
         // TODO add your handling code here:
         selectData();
     }//GEN-LAST:event_refreshActionPerformed
+
+    private void deleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteActionPerformed
+        // TODO add your handling code here:
+        int baris = tabel.getSelectedRow();
+        
+        if(baris != -1)
+        {
+            String nama_peminjam = tabel.getValueAt(baris, 0).toString();
+            String SQL = "DELETE FROM tb_rental WHERE nama_peminjam='" + nama_peminjam + "'";
+            int status = koneksi_db.execute(SQL);
+            
+                if(status == 1)
+                {
+                    JOptionPane.showMessageDialog(this, "Data Berhasil Dihapus", "SUKSES", JOptionPane.INFORMATION_MESSAGE);
+                }
+
+                else
+                {
+                    JOptionPane.showMessageDialog(this, "Data gagal Dihapus","GAGAL", JOptionPane.WARNING_MESSAGE);
+                }
+        }
+        
+        else
+        {
+            JOptionPane.showMessageDialog(this, "Pilih Baris Data Terlebih Dahulu","ERROR",JOptionPane.WARNING_MESSAGE);
+        }
+        
+    }//GEN-LAST:event_deleteActionPerformed
 
     /**
      * @param args the command line arguments
